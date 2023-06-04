@@ -7,7 +7,7 @@ from cv_bridge import CvBridge, CvBridgeError
 def stream() :
   cap = cv2.VideoCapture(0)
   rospy.init_node("cam_pub", anonymous=True)
-  img_pub = rospy.Publisher("cam_img_pub", Image, queue_size=1)
+  img_pub = rospy.Publisher("/cam_pub/raw_img", Image, queue_size=1)
 
   bridge = CvBridge()
   rate = rospy.Rate(10)
