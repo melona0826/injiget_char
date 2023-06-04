@@ -8,7 +8,7 @@ SERVO_MAX_DUTY = 12
 tilt_pin = 33
 
 front_view = 120
-object_view = 170
+object_view = 180
 line_view = 155
 
 GPIO.setwarnings(False)
@@ -33,7 +33,7 @@ if __name__ == '__main__' :
     tilt_control(front_view)
 
   # Object View Mode
-  elif mode == 'oject' :
+  elif mode == 'object' :
     tilt_control(object_view)
 
   # Line View Mode
