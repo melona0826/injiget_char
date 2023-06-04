@@ -13,6 +13,7 @@ def stream() :
   rate = rospy.Rate(10)
   while not rospy.is_shutdown() :
     ret, frame = cap.read()
+    frame = cv2.flip(frame, -1)
     img_pub.publish(bridge.cv2_to_imgmsg(frame, "bgr8"))
     rate.sleep()
 
