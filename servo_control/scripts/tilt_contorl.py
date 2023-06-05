@@ -9,7 +9,7 @@ tilt_pin = 33
 
 front_view = 120
 object_view = 180
-line_view = 155
+line_view = 140
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
