@@ -3,9 +3,6 @@
 #include <image_transport/image_transport.h>
 
 #include <opencv2/opencv.hpp>
-#include <opencv2/features2d.hpp>
-#include <opencv2/xfeatures2d.hpp>
-#include <opencv2/xfeatures2d/nonfree.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/Image.h>
 #include <geometry_msgs/Pose2D.h>
@@ -13,7 +10,15 @@
 
 using namespace std;
 using namespace cv;
-using namespace cv::xfeatures2d;
+
+int h_min = 45;
+int h_max = 65;
+
+int s_min = 20;
+int s_max = 100;
+
+int v_min = 55;
+int v_max = 100;
 
 int main(int argc, char** argv)
 {
@@ -21,8 +26,18 @@ int main(int argc, char** argv)
 
   ros::NodeHandle nh;
 
+  h_min = (int)(h_min/2);
+  h_max = (int)(h_max/2);
+
+  s_min = (int)(s_min * 255 / 100);
+  s_max = (int)(s_max * 255 / 100);
+
+  v_min = (int)(v_min * 255 / 100);
+  v_max = (int)(v_max * 255 / 100);
+
   image_transport::ImageTransport it(nh);
   image_transport::Publisher pub = it.advertise("/pallet_det/ver_edge", 1);
+  image_transport::Publisher pub2 = it.advertise("/pallet_det/image_dark", 1);
   image_transport::Subscriber sub = it.subscribe("/usb_cam/image_raw", 1,
   [&](const sensor_msgs::ImageConstPtr& msg) {
     cv_bridge::CvImageConstPtr cv_ptr;
@@ -38,71 +53,33 @@ int main(int argc, char** argv)
 
     Mat frame = cv_ptr->image;
     flip(frame, frame, -1);
-    cvtColor(frame, frame, COLOR_BGR2GRAY);
+    frame = frame * 0.7;
 
-    Mat ref_img = imread("/home/jetson/catkin_ws/src/injiget_char/pallet_det/src/refer.png", IMREAD_GRAYSCALE);
-    if(ref_img.empty())
-      ROS_ERROR("Reference Img Not Loaded !");
+    Mat img_hsv, img_pallet, img_edge, img_recog;
+    Mat pallet_mask;
+    vector<Vec4i> linesP;
 
-    Ptr<SURF> detector = SURF::create(500);
-    Ptr<SurfDescriptorExtractor> extractor = SurfDescriptorExtractor::create();
-    FlannBasedMatcher matcher;
+    frame.copyTo(img_recog);
 
-    Mat descrip_obj;
+    cvtColor(frame, img_hsv, COLOR_BGR2HSV);
+    inRange(img_hsv, Scalar(h_min, s_min, v_min), Scalar(h_max, s_max, v_max), pallet_mask);
+    bitwise_and(frame, frame, img_pallet,  pallet_mask);
 
-    vector<KeyPoint> key_obj;
+    Canny(img_pallet, img_edge, 30, 70);
 
-    detector->detect(ref_img, key_obj);
-    extractor->compute(ref_img, key_obj, descrip_obj);
+    HoughLinesP(img_edge, linesP, 1, (CV_PI/180), 50, 50, 10);
 
-    //detector->detectAndCompute(ref_img, noArray(), key_obj, descrip_obj);
+    for(size_t i = 0; i < linesP.size(); i++)
+    {
+      Vec4i l = linesP[i];
+      line(img_pallet, Point(3,3), Point(50,3), Scalar(0,0,255), 2, 8);
+    }
 
-    // detector->detectAndCompute(ref_img, noArray(), key_obj, descrip_obj);
-
-    // Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create(DescriptorMatcher::FLANNBASED);
-    // vector<vector<DMatch>> knn_matches;
-    // matcher->knnMatch(descrip_obj, descrip_scene, knn_matches, 2);
-
-    // const float threshold = 0.75;
-    // vector<DMatch> good_matches;
-
-    // for(size_t i = 0; i < knn_matches.size(); i++)
-    // {
-    //   if(knn_matches[i][0].distance < threshold * knn_matches[i][1].distance)
-    //     good_matches.push_back(knn_matches[i][0]);
-    // }
-
-    // Mat img_mat;
-    // drawMatches(ref_img, key_obj, frame, key_scene, good_matches, img_mat, Scalar::all(-1), Scalar::all(-1), vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS);
-
-    // vector<Point2f> obj;
-    // vector<Point2f> scene;
-
-    // for(size_t i = 0; i < good_matches.size(); i++)
-    // {
-    //   obj.push_back(key_obj[good_matches[i].queryIdx].pt);
-    //   scene.push_back(key_scene[good_matches[i].trainIdx].pt);
-    // }
-
-    // Mat H = findHomography(obj, scene, RANSAC);
-
-    // vector<Point2f> obj_corners(4);
-    // obj_corners[0] = Point2f(0,0);
-    // obj_corners[1] = Point2f((float)ref_img.cols,0);
-    // obj_corners[2] = Point2f((float)ref_img.cols, (float)ref_img.rows);
-    // obj_corners[3] = Point2f(0,(float)ref_img.rows);
-    // vector<Point2f> scene_corners(4);
-
-    // perspectiveTransform(obj_corners, scene_corners, H);
-
-    // line(img_mat, scene_corners[0] + Point2f((float)ref_img.cols,0) , scene_corners[1] + Point2f((float)ref_img.cols,0), Scalar(0, 255,0), 4);
-    // line(img_mat, scene_corners[1] + Point2f((float)ref_img.cols,0) , scene_corners[2] + Point2f((float)ref_img.cols,0), Scalar(0, 255,0), 4);
-    // line(img_mat, scene_corners[2] + Point2f((float)ref_img.cols,0) , scene_corners[3] + Point2f((float)ref_img.cols,0), Scalar(0, 255,0), 4);
-    // line(img_mat, scene_corners[3] + Point2f((float)ref_img.cols,0) , scene_corners[0] + Point2f((float)ref_img.cols,0), Scalar(0, 255,0), 4);
-
-    sensor_msgs::ImageConstPtr pub_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", ref_img).toImageMsg();
+    sensor_msgs::ImageConstPtr pub_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img_pallet).toImageMsg();
+    sensor_msgs::ImageConstPtr pub_msg2 = cv_bridge::CvImage(std_msgs::Header(), "bgr8", img_pallet).toImageMsg();
 
     pub.publish(pub_msg);
+    pub2.publish(pub_msg2);
 
   });
 

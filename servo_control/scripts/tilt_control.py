@@ -1,3 +1,5 @@
+import rospy
+from std_msgs.msg import String
 import Jetson.GPIO as GPIO
 import time
 import sys
@@ -8,11 +10,12 @@ SERVO_MAX_DUTY = 12
 tilt_pin = 33
 
 front_view = 120
-object_view = 180
+object_view = 150
 line_view = 140
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
+
 GPIO.setup(tilt_pin, GPIO.OUT)
 
 pwm_1 = GPIO.PWM(tilt_pin, 50)
@@ -26,8 +29,8 @@ def tilt_control(deg):
   time.sleep(1)
 
 
-if __name__ == '__main__' :
-  mode = sys.argv[1]
+def callback(data) :
+  mode = data.data
   # Front View Mode
   if mode == 'front':
     tilt_control(front_view)
@@ -40,6 +43,17 @@ if __name__ == '__main__' :
   elif mode == 'line':
     tilt_control(line_view)
 
-  pwm_1.stop()
-  GPIO.cleanup()
+
+def move() :
+  rospy.init_node('tilt', anonymous=True)
+  rospy.Subscriber('/tilt/mode', String, callback)
+
+  rospy.spin()
+
+
+if __name__ == '__main__' :
+  tilt_control(front_view)
+  move()
+
+
 

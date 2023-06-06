@@ -1,3 +1,5 @@
+import rospy
+from std_msgs.msg import String
 import Jetson.GPIO as GPIO
 import time
 import sys
@@ -12,6 +14,7 @@ down = 40
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
+
 GPIO.setup(tilt_pin, GPIO.OUT)
 
 pwm_1 = GPIO.PWM(tilt_pin, 50)
@@ -25,8 +28,8 @@ def tilt_control(deg):
   time.sleep(1)
 
 
-if __name__ == '__main__' :
-  mode = sys.argv[1]
+def callback(data) :
+  mode = data.data
   # Fork Up Mode
   if mode == 'up':
     tilt_control(up)
@@ -35,7 +38,14 @@ if __name__ == '__main__' :
   elif mode == 'down' :
     tilt_control(down)
 
+def move() :
+  rospy.init_node('fork', anonymous=True)
+  rospy.Subscriber('/fork/mode', String, callback)
 
-  pwm_1.stop()
-  GPIO.cleanup()
+  rospy.spin()
+
+
+if __name__ == '__main__' :
+  tilt_control(down)
+  move()
 
