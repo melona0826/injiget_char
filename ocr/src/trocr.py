@@ -21,7 +21,7 @@ def similar(a, b):
 def get_answer(ground_truths, results):
     answers = []
     for word in results:
-      similars = [similar(g, word) for g in ground_truths]
+      similars = [similar(g, word.lower().strip()) for g in ground_truths]
       max_index = similars.index(max(similars))
       answers.append(ground_truths[max_index])
     
@@ -54,4 +54,4 @@ if __name__ == "__main__":
   # processor.save_pretrained("../models/trocr-base-handwritten")
   # model.save_pretrained("../models/trocr-base-handwritten")
   
-  trocr('../assets/test6.jpg', ["welchs", "hello", "oronamin", "dejava", "demisoda"], 5)
+  trocr('../assets/test10.jpg', ["welchs", "cantata", "oronamin", "tejava", "demisoda"], 4)
