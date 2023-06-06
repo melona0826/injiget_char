@@ -27,10 +27,10 @@ def get_answer(ground_truths, results):
     
     return answers
 
-def trocr(path, ground_truth, cnt):
+def trocr(path, ground_truth, cnt, detail):
   image = cv2.imread(path)
  
-  detected_images, detected_places = image_preprocess.make_scan_image(image, ksize=(5, 5), min_threshold=20, max_threshold=150, max_count=cnt)
+  detected_images, detected_places = image_preprocess.make_scan_image(image, ksize=(5, 5), min_threshold=50, max_threshold=200, max_count=cnt, detail=detail)
   results = process_image(detected_images)
   answers = get_answer(ground_truth, results)
   print("=====OCR Result=====")
@@ -54,4 +54,4 @@ if __name__ == "__main__":
   # processor.save_pretrained("../models/trocr-base-handwritten")
   # model.save_pretrained("../models/trocr-base-handwritten")
   
-  trocr('../assets/test10.jpg', ["welchs", "cantata", "oronamin", "tejava", "demisoda"], 4)
+  trocr('../assets/test11.jpg', ["welchs", "cantata", "oronamin", "tejava", "demisoda"], 4, detail=True)

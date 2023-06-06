@@ -25,10 +25,10 @@ def get_answer(ground_truths, results):
     
     return answers
 
-def tesseract(path, ground_truth, cnt):
+def tesseract(path, ground_truth, cnt, detail):
   image = cv2.imread(path)
  
-  detected_images, detected_places = image_preprocess.make_scan_image(image, ksize=(5, 5), min_threshold=20, max_threshold=150, max_count=cnt)
+  detected_images, detected_places = image_preprocess.make_scan_image(image, ksize=(5, 5), min_threshold=20, max_threshold=150, max_count=cnt, detail=detail)
   results = process_image(detected_images)
   answers = get_answer(ground_truth, results)
   print("=====Tesseract OCR Result=====")
@@ -40,4 +40,4 @@ def tesseract(path, ground_truth, cnt):
   return answers, detected_places
 
 if __name__ == "__main__":
-  tesseract('../assets/test10.jpg', ["welchs", "cantata", "oronamin", "tejava", "demisoda"], 4)
+  tesseract('../assets/test10.jpg', ["welchs", "cantata", "oronamin", "tejava", "demisoda"], 4, detail=False)
