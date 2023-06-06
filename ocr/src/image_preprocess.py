@@ -81,14 +81,14 @@ def make_scan_image(image, ksize=(5,5), min_threshold=100, max_threshold=200, ma
   image_list_title.append("Outline")
   image_list.append(output)
   
-  for i in range(len(image_list)):
-    plt_imshow(image_list_title[i], image_list[i])
+#   for i in range(len(image_list)):
+#     plt_imshow(image_list_title[i], image_list[i])
   
-  for fc in sorted(find_cnts, key=lambda x: np.min(x.reshape(4,2), axis=0)[0]):
+  for i,fc in enumerate(sorted(find_cnts, key=lambda x: np.min(x.reshape(4,2), axis=0)[0])):
       transform_image = four_point_transform(org_image, fc.reshape(4, 2) * ratio)
       transform_images.append(transform_image)
       find_places.append(np.mean(fc.reshape(4,2), axis=0).tolist())
-      plt_imshow("hi", transform_image)
+    #   plt_imshow(i, transform_image)
   
   return transform_images, find_places
 
