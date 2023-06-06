@@ -27,13 +27,13 @@ class SubAndPub
 
       if(msg.x > 400)
       {
-        cmd_vel.angular.z = -0.2;
+        cmd_vel.angular.z += -0.1;
         ROS_INFO(" RIGHT ! ");
       }
 
       else if(msg.x < 300)
       {
-        cmd_vel.angular.z = 0.2;
+        cmd_vel.angular.z += 0.1;
         ROS_INFO(" LEFT ! ");
       }
 

@@ -5,30 +5,31 @@
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/Image.h>
 #include <geometry_msgs/Pose2D.h>
-
 #include <vector>
 
 using namespace std;
 using namespace cv;
 
-//Yellow ROI
-int roi_x = 1760;
-int roi_y = 0;
-int roi_width = 2500;
-int roi_height = 700;
+int frame_wid = 640;
+int frame_hei = 480;
 
-//Yellow Color Setting
-int yellow_hue_low = 10;
-int yellow_hue_high = 30;
-int yellow_sat_low = 60;
-int yellow_sat_high = 255;
-int yellow_val_low = 50;
-int yellow_val_high =200;
+int roi_x = 0;
+int roi_y = 0;
+
+int roi_width = frame_wid - roi_x;
+int roi_height = frame_hei - roi_y;
+
+int black_hue_low = 0;
+int black_hue_high = 255;
+int black_sat_low = 12 * (int)(255 / 100);
+int black_sat_high = 50 * (int)(255 / 100);
+int black_val_low = 0 * (int)(255 / 100);
+int black_val_high = 70 * (int)(255 / 100);
 
 int main(int argc, char** argv)
 {
-  // Node Name : yellow_detect
-  ros::init(argc, argv, "yellow_detect");
+  // Node Name : line_detect
+  ros::init(argc, argv, "line_detect");
 
   ros::NodeHandle nh;
 
@@ -40,13 +41,13 @@ int main(int argc, char** argv)
     msg.theta = m (Radian degree of line)
   */
   geometry_msgs::Pose2D fitLine_msg;
-  ros::Publisher pub_fitLine = nh.advertise<geometry_msgs::Pose2D>("/yellow_detect/yellow_line_pos", 1000);
+  ros::Publisher pub_fitLine = nh.advertise<geometry_msgs::Pose2D>("/line_detect/line_pos", 1000);
 
   // Set Publishers & Sublscribers
   image_transport::ImageTransport it(nh);
-  image_transport::Publisher pub = it.advertise("/yellow_detect/yellow_detect_img", 1);
-  image_transport::Publisher pub2 = it.advertise("/yellow_detect/yellow_img", 1);
-  image_transport::Subscriber sub = it.subscribe("/mindvision1/image", 1,
+  image_transport::Publisher pub = it.advertise("/line_detect/detect_img", 1);
+  image_transport::Publisher pub2 = it.advertise("/line_detect/line_img", 1);
+  image_transport::Subscriber sub = it.subscribe("/usb_cam/image_raw", 1,
   [&](const sensor_msgs::ImageConstPtr& msg){
     cv_bridge::CvImageConstPtr cv_ptr;
     try
@@ -60,12 +61,14 @@ int main(int argc, char** argv)
     }
 
     // Recognize Slope angle tolerance
-    int slope_tor = 45;
+    int slope_tor = 70;
     // Recognize Slope angle treshold (-45 deg ~ 45deg)
     double slope_treshold = (90 - slope_tor) * CV_PI / 180.0;
 
-    Mat img_hsv, yellow_mask, img_yellow, img_edge;
+    Mat img_hsv, line_mask, img_line, img_edge;
+    Mat test;
     Mat frame = cv_ptr->image;
+    flip(frame, frame, -1);
     Mat grayImg, blurImg, edgeImg, copyImg;
 
     Point pt1, pt2;
@@ -78,19 +81,20 @@ int main(int argc, char** argv)
     Rect roi(roi_x, roi_y, roi_width, roi_height);
     frame = frame(bounds & roi);
 
-    // Color Filtering
+    GaussianBlur(frame, frame, Size(5,5), 15);
 
+    // Color Filtering
     cvtColor(frame, img_hsv, COLOR_BGR2HSV);
-    inRange(img_hsv, Scalar(yellow_hue_low, yellow_sat_low, yellow_val_low) , Scalar(yellow_hue_high, yellow_sat_high, yellow_val_high), yellow_mask);
-    bitwise_and(frame, frame, img_yellow, yellow_mask);
-    img_yellow.copyTo(copyImg);
+    inRange(img_hsv, Scalar(black_hue_low, black_sat_low, black_val_low) , Scalar(black_hue_high, black_sat_high, black_val_high), line_mask);
+    bitwise_and(frame, frame, img_line, line_mask);
+    img_line.copyTo(copyImg);
 
     // Canny Edge Detection
-    cvtColor(img_yellow, img_yellow, COLOR_BGR2GRAY);
-    Canny(img_yellow, img_edge, 50, 450);
+    cvtColor(img_line, img_line, COLOR_BGR2GRAY);
+    Canny(img_line, img_edge, 100, 170);
 
     // Line Dtection
-    HoughLinesP(img_edge, lines, 1, CV_PI / 180 , 50 ,20, 10);
+    HoughLinesP(img_edge, lines, 1, CV_PI / 180 , 6 , 15, 12);
 
     //cout << "slope treshol : " << slope_treshold << endl;
 
@@ -145,7 +149,7 @@ int main(int argc, char** argv)
 
     //ROS_INFO("cols : %d , rows : %d" , frame.cols, frame.rows);
     sensor_msgs::ImagePtr pub_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
-    sensor_msgs::ImagePtr pub_msg2 = cv_bridge::CvImage(std_msgs::Header(), "bgr8", copyImg).toImageMsg();
+    sensor_msgs::ImagePtr pub_msg2 = cv_bridge::CvImage(std_msgs::Header(), "mono8", img_edge).toImageMsg();
     pub.publish(pub_msg);
     pub2.publish(pub_msg2);
     pub_fitLine.publish(fitLine_msg);

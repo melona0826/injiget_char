@@ -10,7 +10,7 @@ def stream() :
   img_pub = rospy.Publisher("cam_img_pub", Image, queue_size=1)
 
   bridge = CvBridge()
-  rate = rospy.Rate(10)
+  rate = rospy.Rate(1)
   while not rospy.is_shutdown() :
     ret, frame = cap.read()
     img_pub.publish(bridge.cv2_to_imgmsg(frame, "bgr8"))

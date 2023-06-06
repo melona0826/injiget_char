@@ -4,35 +4,56 @@
 #include <opencv2/opencv.hpp>
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/Image.h>
+#include <geometry_msgs/Pose2D.h>
 #include <vector>
 
 using namespace std;
 using namespace cv;
 
-int frame_wid = 1600;
-int frame_hei = 1200;
+int frame_wid = 640;
+int frame_hei = 300;
 
-int roi_x = 80;
-int roi_y = 240;
+int roi_x = 100;
+int roi_y = 200;
+
 int roi_width = frame_wid - roi_x;
 int roi_height = frame_hei - roi_y;
 
 int black_hue_low = 0;
-int black_hue_high = 255;
-int black_sat_low = 0;
-int black_sat_high = 255;
-int black_val_low = 0;
-int black_val_high =80;
+int black_hue_high = 180;
+int black_sat_low = 25 * (int)(255 / 100);
+int black_sat_high = 35 * (int)(255 / 100);
+int black_val_low = 20 * (int)(255 / 100);
+int black_val_high = 35 * (int)(255 / 100);
+
+
 
 int main(int argc, char** argv)
 {
+
+  Mat ref = imread("refer1.png", IMREAD_GRAYSCALE);
+  if(ref.empty())
+    ROS_ERROR("SIBAL");
+  // Node Name : line_detect
   ros::init(argc, argv, "line_detect");
+
   ros::NodeHandle nh;
 
+  /*  fitLine_msg
+    Type : geometry_msgs/Pose2D
+
+    msg.x = b.x   (x value of point on line)
+    msg.y = b.y   (y value of point on line)
+    msg.theta = m (Radian degree of line)
+  */
+  geometry_msgs::Pose2D fitLine_msg;
+  ros::Publisher pub_fitLine = nh.advertise<geometry_msgs::Pose2D>("/line_detect/line_pos", 1000);
+
+  // Set Publishers & Sublscribers
   image_transport::ImageTransport it(nh);
   image_transport::Publisher pub = it.advertise("/line_detect/detect_img", 1);
-  image_transport::Publisher pub2 = it.advertise("/line_detect/black_img", 1);
-  image_transport::Subscriber sub = it.subscribe("/cam_pub/raw_img", 1,
+  image_transport::Publisher pub2 = it.advertise("/line_detect/line_img", 1);
+  image_transport::Subscriber sub = it.subscribe("/usb_cam/image_raw", 1,
   [&](const sensor_msgs::ImageConstPtr& msg){
     cv_bridge::CvImageConstPtr cv_ptr;
     try
@@ -45,44 +66,47 @@ int main(int argc, char** argv)
       return;
     }
 
-    Mat frame = cv_ptr->image;
-    Mat grayImg, blurImg, edgeImg;
+    // Recognize Slope angle tolerance
+    int slope_tor = 70;
+    // Recognize Slope angle treshold (-45 deg ~ 45deg)
+    double slope_treshold = (90 - slope_tor) * CV_PI / 180.0;
 
+    Mat img_hsv, line_mask, img_line, img_edge;
+    Mat test;
+    Mat frame = cv_ptr->image;
+
+    // PreProcessing
+    flip(frame, frame, -1);
+    frame = (frame * 0.5);
+
+    Mat grayImg, blurImg, edgeImg, copyImg;
+
+    Point pt1, pt2;
+    vector<Vec4i> lines, selected_lines;
+    vector<double> slopes;
+    vector<Point> pts;
+    Vec4d fit_line;
 
     Rect bounds(0, 0, frame.cols, frame.rows);
     Rect roi(roi_x, roi_y, roi_width, roi_height);
     frame = frame(bounds & roi);
 
-    cout << "row : " << frame.rows << endl;
-    cout << "cols : " << frame.cols << endl;
+    GaussianBlur(frame, frame, Size(5,5), 15);
 
-    Mat img_hsv, black_mask, img_black, img_edge;
+    // Color Filtering
     cvtColor(frame, img_hsv, COLOR_BGR2HSV);
+    inRange(img_hsv, Scalar(black_hue_low, black_sat_low, black_val_low) , Scalar(black_hue_high, black_sat_high, black_val_high), line_mask);
+    bitwise_and(frame, frame, img_line, line_mask);
+    img_line.copyTo(copyImg);
 
-    //inRange(img_hsv, Scalar(10, 71, 76) , Scalar(30, 255, 255), black_mask);
-    inRange(img_hsv, Scalar(black_hue_low, black_sat_low, black_val_low) , Scalar(black_hue_high, black_sat_high, black_val_high), black_mask);
+    // Canny Edge Detection
+    cvtColor(img_line, grayImg, COLOR_BGR2GRAY);
+    Canny(grayImg, img_edge, 100, 170);
 
-    bitwise_and(frame, frame, img_black, black_mask);
+    // Line Dtection
+    HoughLinesP(img_edge, lines, 1, CV_PI / 180 , 6 , 15, 12);
 
-    Mat copyImg;
-    img_black.copyTo(copyImg);
-
-    cvtColor(img_black, img_black, COLOR_BGR2GRAY);
-    Canny(img_black, img_edge, 50, 450);
-
-    vector<Vec4i> lines;
-    HoughLinesP(img_edge, lines, 1, CV_PI / 180 , 50 ,20, 10);
-
-
-    Point pt1, pt2;
-    vector<double> slopes;
-    vector<Vec4i> selected_lines;
-    vector<Point> pts;
-    Vec4d fit_line;
-    int slope_tor = 45;
-    double slope_treshol = (90 - slope_tor) * CV_PI / 180.0;
-
-
+    //cout << "slope treshol : " << slope_treshold << endl;
 
     for(size_t i = 0; i < lines.size(); i++)
     {
@@ -94,7 +118,7 @@ int main(int argc, char** argv)
       //cout << slope << endl;
 
       cv::line(frame, Point(pt1.x, pt1.y) , Point(pt2.x , pt2.y) , Scalar(0,255,0) , 2 , 8);
-      if(abs(slope) >= slope_treshol)
+      if(abs(slope) >= slope_treshold)
       {
         selected_lines.push_back(line);
         pts.push_back(pt1);
@@ -118,8 +142,11 @@ int main(int argc, char** argv)
       //cout << "slope : " << (static_cast<double>(pt1_y) - static_cast<double>(pt2_y)) / (static_cast<double>(pt1_x) - static_cast<double>(pt2_x)) << endl;
 
       line(frame, Point(pt1_x, pt1_y) , Point(pt2_x , pt2_y) , Scalar(0,0,255) , 2 , 8);
-    }
 
+      fitLine_msg.x = b.x;
+      fitLine_msg.y = b.y;
+      fitLine_msg.theta = m;
+    }
 
 
    for(size_t i = 0; i < selected_lines.size(); i++)
@@ -130,18 +157,16 @@ int main(int argc, char** argv)
     }
 
 
-
-
-
     //ROS_INFO("cols : %d , rows : %d" , frame.cols, frame.rows);
-
     sensor_msgs::ImagePtr pub_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
     sensor_msgs::ImagePtr pub_msg2 = cv_bridge::CvImage(std_msgs::Header(), "bgr8", copyImg).toImageMsg();
     pub.publish(pub_msg);
     pub2.publish(pub_msg2);
-
+    pub_fitLine.publish(fitLine_msg);
 
   });
+
+
 
   ros::spin();
 
