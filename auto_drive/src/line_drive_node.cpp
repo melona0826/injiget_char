@@ -29,6 +29,12 @@ class SubAndPub
       sub_finish_ = nh_.subscribe("/finish_line_detect/line_pos" , 1, &SubAndPub::finsihCallback, this);
     }
 
+    void toggleCallback(const std_msgs::String& msg)
+    {
+      if(msg.data == "Start")
+        start_toggle = 1;
+    }
+
     void objCallBack(const std_msgs::String& msg)
     {
       obj_name_msg.data = msg.data;
@@ -36,55 +42,57 @@ class SubAndPub
 
     void finsihCallback(const geometry_msgs::Pose2D& msg)
     {
-      if(!finish_toggle && msg.y > 80)
+      if(start_toggle)
       {
-        finish_toggle = 1;
-        cmd_vel.linear.x = 0.0;
-        cmd_vel.linear.y= 0.0;
-        cmd_vel.angular.z = 0.0;
-        pub_.publish(cmd_vel);
+        if(!finish_toggle && msg.y > 30)
+        {
+          finish_toggle = 1;
+          cmd_vel.linear.x = 0.0;
+          cmd_vel.linear.y= 0.0;
+          cmd_vel.angular.z = 0.0;
+          pub_.publish(cmd_vel);
+        }
+        else if(finish_toggle && msg.x < finish_center - finishi_tor)
+        {
+          finish_toggle = 1;
+          cmd_vel.linear.x = 0.0;
+          cmd_vel.linear.y= 0.0;
+          cmd_vel.angular.z = 0.02;
+          pub_.publish(cmd_vel);
+        }
+
+        else if(finish_toggle && msg.x > finish_center + finishi_tor)
+        {
+          finish_toggle = 1;
+          cmd_vel.linear.x = 0.0;
+          cmd_vel.linear.y= 0.0;
+          cmd_vel.angular.z = -0.02;
+          pub_.publish(cmd_vel);
+        }
+
+        else if(finish_toggle)
+        {
+          ROS_INFO("DDD");
+          tilt_mode.data = "front";
+          pub_tilt_.publish(tilt_mode);
+          terminate_msg.data = "Terminate";
+          pub_terminate_.publish(terminate_msg);
+          std::this_thread::sleep_for(1s);
+
+          ocr_toggle_msg.data = "Start";
+          pub_obj_.publish(obj_name_msg);
+          pub_ocr_start_.publish(ocr_toggle_msg);
+
+          ros::shutdown();
+        }
+
+        ROS_INFO("[FINISH LINE] X : %f  |  Y : %f" , msg.x, msg.y);
       }
-      else if(finish_toggle && msg.x < finish_center - finishi_tor)
-      {
-        finish_toggle = 1;
-        cmd_vel.linear.x = 0.0;
-        cmd_vel.linear.y= 0.0;
-        cmd_vel.angular.z = 0.02;
-        pub_.publish(cmd_vel);
-      }
-
-      else if(finish_toggle && msg.x > finish_center + finishi_tor)
-      {
-        finish_toggle = 1;
-        cmd_vel.linear.x = 0.0;
-        cmd_vel.linear.y= 0.0;
-        cmd_vel.angular.z = -0.02;
-        pub_.publish(cmd_vel);
-      }
-
-      else if(finish_toggle)
-      {
-        ROS_INFO("DDD");
-        tilt_mode.data = "front";
-        pub_tilt_.publish(tilt_mode);
-        terminate_msg.data = "Terminate";
-        pub_terminate_.publish(terminate_msg);
-        std::this_thread::sleep_for(1s);
-
-        ocr_toggle_msg.data = "Start";
-        pub_obj_.publish(obj_name_msg);
-        pub_ocr_start_.publish(ocr_toggle_msg);
-
-        ros::shutdown();
-      }
-
-      ROS_INFO("[FINISH LINE] X : %f  |  Y : %f" , msg.x, msg.y);
-
     }
 
     void callback(const geometry_msgs::Pose2D& msg)
     {
-      if(!finish_toggle)
+      if(start_toggle && !finish_toggle)
       {
         ROS_INFO("X : %f" , msg.x);
         ROS_INFO("Y : %f" , msg.y);
@@ -130,7 +138,7 @@ class SubAndPub
     std_msgs::String terminate_msg;
     std_msgs::String ocr_toggle_msg;
     std_msgs::String obj_name_msg;
-    std_msgs::String start_toggle;
+    int start_toggle = 0;
     int finish_toggle = 0;
     int center = 320;
     int finish_center = 180;

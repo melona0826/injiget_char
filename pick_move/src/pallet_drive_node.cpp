@@ -23,6 +23,7 @@ class SubAndPub
       pub_tilt_ = nh_.advertise<std_msgs::String>("/tilt/mode", 100, true);
       pub_fork_ = nh_.advertise<std_msgs::String>("/fork/mode", 100, true);
       pub_terminate_ = nh_.advertise<std_msgs::String>("/pallet_pick/terminate", 1, true);
+      pub_drive_toggle_ = nh_.advertise<std_msgs::String>("/drive_start/toggle", 1, true);
       sub_ = nh_.subscribe("/pallet_det/pallet_pos", 1,  &SubAndPub::callback, this);
     }
 
@@ -70,8 +71,11 @@ class SubAndPub
         pub_fork_.publish(fork_mode);
         terminate_msg.data = "Terminate";
         pub_terminate_.publish(terminate_msg);
+
         std::this_thread::sleep_for(1s);
 
+        drive_toggle_msg.data = "Start";
+        pub_drive_toggle_.publish(drive_toggle_msg);
         ros::shutdown();
       }
 
@@ -108,10 +112,12 @@ class SubAndPub
     ros::Publisher pub_tilt_;
     ros::Publisher pub_fork_;
     ros::Publisher pub_terminate_;
+    ros::Publisher pub_drive_toggle_;
     ros::Subscriber sub_;
     std_msgs::String tilt_mode;
     std_msgs::String fork_mode;
     std_msgs::String terminate_msg;
+    std_msgs::String drive_toggle_msg;
     geometry_msgs::Twist cmd_vel;
     float turn_f_speed = 0.1;
     float turn_speed = 0.1;

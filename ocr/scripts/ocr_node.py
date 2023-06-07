@@ -25,7 +25,7 @@ class ocrNode :
     # self.pub_3 = rospy.Publisher('/ocr/recog3', Image, queue_size=1)
     # self.pub_4 = rospy.Publisher('/ocr/recog4', Image, queue_size=1)
     self.edge_img = None
-
+    self.obj_name = None
     self.ocr_toggle = 0
     self.bridge = CvBridge()
     self.pos_msg = Pose2D()
@@ -35,6 +35,12 @@ class ocrNode :
     rospy.Subscriber('/usb_cam/image_raw', Image, self.callback)
     rospy.Subscriber('/ocr/toggle', String, self.toggleCallback)
     rospy.Subscriber('/object/name', String, self.objectCallback)
+
+  def objectCallback(self, msg) :
+    self.obj_name = msg.data
+
+  def toggleCallback(self, msg) :
+    self.ocr_toggle = 1
 
   def make_scan_image(self, image, ksize=(5,5), min_threshold=100, max_threshold=200, max_count=2, detail=False):
     image_list_title = []
@@ -160,6 +166,7 @@ class ocrNode :
 
 
   def callback(self, msg) :
+    if self.ocr_toggle == 1:
       try :
         rospy.loginfo("===OCR START===")
         frame = self.bridge.imgmsg_to_cv2(msg, 'bgr8')

@@ -130,7 +130,7 @@ int main(int argc, char** argv)
       double pt1_x = ((pt1_y - b.y) / m) + b.x;
       double pt2_x = ((pt2_y - b.y) / m) + b.x;
 
-      cout << "slope : " << (static_cast<double>(pt1_y) - static_cast<double>(pt2_y)) / (static_cast<double>(pt1_x) - static_cast<double>(pt2_x)) << endl;
+      // cout << "slope : " << (static_cast<double>(pt1_y) - static_cast<double>(pt2_y)) / (static_cast<double>(pt1_x) - static_cast<double>(pt2_x)) << endl;
 
       line(frame, Point(pt1_x, pt1_y) , Point(pt2_x , pt2_y) , Scalar(255,0,0) , 2 , 8);
 
@@ -138,8 +138,8 @@ int main(int argc, char** argv)
       fitLine_msg.y = b.y;
       fitLine_msg.theta = m;
 
-      cout << "x : " << b.x << endl;;
-      cout << "y : " << b.y << endl;;
+      // cout << "x : " << b.x << endl;;
+      // cout << "y : " << b.y << endl;;
       terminate_count = 0;
     }
 
