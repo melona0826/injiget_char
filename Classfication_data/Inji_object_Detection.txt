@@ -5,10 +5,8 @@ import numpy as np
 import pathlib
 import matplotlib.pyplot as plt
 
-
-
 img = cv2.imread("injigayinput.jpg")
-model = YOLO("model_4.pt")
+model = YOLO("model_- 4 june 2023 17_04.pt")
 results = model(img)
 res_plotted = results[0].plot()
 
