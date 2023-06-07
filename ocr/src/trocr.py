@@ -4,6 +4,7 @@ import cv2
 import image_preprocess
 import torch
 from difflib import SequenceMatcher
+import rospy
 
 def process_image(images):
     results = []
