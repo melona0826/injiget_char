@@ -158,17 +158,8 @@ class ocrNode :
 
   #   return answers, detected_places
 
-  def toggleCallback(self, msg) :
-    if msg.data == "OCR" :
-      self.ocr_toggle = 1
-    else :
-      self.ocr_toggle = 0
-
-  def objectCallback(self, msg):
-    self.obj_name = msg.data
 
   def callback(self, msg) :
-    if self.ocr_toggle == 1 :
       try :
         rospy.loginfo("===OCR START===")
         frame = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
@@ -185,8 +176,6 @@ class ocrNode :
         rospy.loginfo("[OCR] y : " + str(self.pos_msg.y))
         time.sleep(1)
         #rospy.signal_shutdown("Success OCR")
-
-
 
       except Exception as e :
         rospy.logerr(e)

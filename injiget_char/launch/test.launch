@@ -1,0 +1,6 @@
+<launch>
+  <node pkg="pallet_det" name= "pallet_det_node" type="pallet_det_node" respawn="false" output="screen"/>
+  <node pkg="pick_move" name= "pallet_drive_node" type="pallet_drive_node" respawn="false" output="screen"/>
+  <node pkg="line_detect" name= "detect_node" type="detect_node" respawn="false" output="screen"/>
+  <node pkg="line_detect" name= "finish_line_detect_node" type="finish_line_detect_node" respawn="false" output="screen"/>
+</launch>
