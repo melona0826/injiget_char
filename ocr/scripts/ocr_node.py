@@ -20,10 +20,10 @@ class ocrNode :
     rospy.init_node('ocr_node')
     self.pub_pos = rospy.Publisher('/ocr/place_pos', Pose2D, queue_size=1)
     self.pub_tog = rospy.Publisher('/place/toggle', String, queue_size=1)
-    self.pub_1 = rospy.Publisher('/ocr/recog', Image, queue_size=1)
-    self.pub_2 = rospy.Publisher('/ocr/recog2', Image, queue_size=1)
-    self.pub_3 = rospy.Publisher('/ocr/recog3', Image, queue_size=1)
-    self.pub_4 = rospy.Publisher('/ocr/recog4', Image, queue_size=1)
+    # self.pub_1 = rospy.Publisher('/ocr/recog', Image, queue_size=1)
+    # self.pub_2 = rospy.Publisher('/ocr/recog2', Image, queue_size=1)
+    # self.pub_3 = rospy.Publisher('/ocr/recog3', Image, queue_size=1)
+    # self.pub_4 = rospy.Publisher('/ocr/recog4', Image, queue_size=1)
     self.edge_img = None
 
     self.ocr_toggle = 0
@@ -168,9 +168,9 @@ class ocrNode :
     self.obj_name = msg.data
 
   def callback(self, msg) :
-    rospy.loginfo(self.ocr_toggle)
     if self.ocr_toggle == 1 :
       try :
+        rospy.loginfo("===OCR START===")
         frame = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
         frame = cv2.flip(frame, -1)
 
@@ -181,7 +181,8 @@ class ocrNode :
         self.pos_msg.y = pos[idx][1]
         self.pub_pos.publish(self.pos_msg)
         self.pub_tog.publish("Place")
-        rospy.loginfo(self.pos_msg)
+        rospy.loginfo("[OCR] x : " + str(self.pos_msg.x))
+        rospy.loginfo("[OCR] y : " + str(self.pos_msg.y))
         time.sleep(1)
         #rospy.signal_shutdown("Success OCR")
 
@@ -200,9 +201,9 @@ if __name__ == '__main__' :
 
   # processor.save_pretrained("../models/trocr-base-handwritten")
   # model.save_pretrained("../models/trocr-base-handwritten")
-
-  processor = TrOCRProcessor.from_pretrained("../models/trocr-base-handwritten")
-  model = VisionEncoderDecoderModel.from_pretrained("../models/trocr-base-handwritten")
+  path = '/home/kj/catkin_ws/src/injiget_char/ocr/'
+  processor = TrOCRProcessor.from_pretrained(path + "models/trocr-base-handwritten")
+  model = VisionEncoderDecoderModel.from_pretrained(path + "models/trocr-base-handwritten")
 
   ocr_node = ocrNode()
   rospy.spin()
