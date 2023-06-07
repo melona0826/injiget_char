@@ -24,12 +24,12 @@ def get_answer(ground_truths, results):
       similars = [similar(g, word.lower().strip()) for g in ground_truths]
       max_index = similars.index(max(similars))
       answers.append(ground_truths[max_index])
-    
+
     return answers
 
 def trocr(path, ground_truth, cnt, detail):
   image = cv2.imread(path)
- 
+
   detected_images, detected_places = image_preprocess.make_scan_image(image, ksize=(5, 5), min_threshold=50, max_threshold=200, max_count=cnt, detail=detail)
   results = process_image(detected_images)
   answers = get_answer(ground_truth, results)
@@ -38,20 +38,20 @@ def trocr(path, ground_truth, cnt, detail):
   print("=====OCR Corrected Result=====")
   print(answers)
   print(detected_places)
-  
+
   return answers, detected_places
 
 if __name__ == "__main__":
   device = "cuda:0" if torch.cuda.is_available() else "cpu"
   print(device)
-  
-  processor = TrOCRProcessor.from_pretrained("../models/trocr-base-handwritten")
-  model = VisionEncoderDecoderModel.from_pretrained("../models/trocr-base-handwritten")
-  
-  # processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
-  # model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handwritten")
 
-  # processor.save_pretrained("../models/trocr-base-handwritten")
-  # model.save_pretrained("../models/trocr-base-handwritten")
-  
-  trocr('../assets/test11.jpg', ["welchs", "cantata", "oronamin", "tejava", "demisoda"], 4, detail=True)
+  # processor = TrOCRProcessor.from_pretrained("../models/trocr-base-handwritten")
+  # model = VisionEncoderDecoderModel.from_pretrained("../models/trocr-base-handwritten")
+
+  processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
+  model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handwritten")
+
+  processor.save_pretrained("../models/trocr-base-handwritten")
+  model.save_pretrained("../models/trocr-base-handwritten")
+
+  trocr('../test_imgs/test1.png', ["welchs", "cantata", "oronamin", "tejava", "demisoda"], 4, detail=True)

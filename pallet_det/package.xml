@@ -7,11 +7,7 @@
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
   <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
-<<<<<<< HEAD
   <maintainer email="kwonjin@kaist.ac.kr">Kwon Jin</maintainer>
-=======
-  <maintainer email="kwonjin@kaist.ac.kr">kj</maintainer>
->>>>>>> 30531393cab546a6c417a767c67c5ba65382bd42
 
 
   <!-- One license tag required, multiple allowed, one license per tag -->
@@ -19,7 +15,6 @@
   <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
   <license>BSD</license>
 
-<<<<<<< HEAD
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>cv_bridge</build_depend>
@@ -27,51 +22,23 @@
   <build_depend>sensor_msgs</build_depend>
   <build_depend>OpenCV</build_depend>
   <build_depend>std_msgs</build_depend>
-=======
-
-  <!-- Url tags are optional, but multiple are allowed, one per tag -->
-  <!-- Optional attribute type can be: website, bugtracker, or repository -->
-  <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/pallet_det</url> -->
-
-
-  <!-- Author tags are optional, multiple are allowed, one per tag -->
-  <!-- Authors do not have to be maintainers, but could be -->
-  <!-- Example: -->
-  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
-
-  <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>roscpp</build_depend>
-  <build_depend>cv_bridge</build_depend>
-  <build_depend>image_transport</build_depend>
-  <build_depend>sensor_msgs</build_depend>
   <build_depend>geometry_msgs</build_depend>
-  <build_depend>OpenCV</build_depend>
->>>>>>> 30531393cab546a6c417a767c67c5ba65382bd42
 
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>cv_bridge</build_export_depend>
   <build_export_depend>image_transport</build_export_depend>
   <build_export_depend>sensor_msgs</build_export_depend>
-<<<<<<< HEAD
   <build_export_depend>OpenCV</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
-=======
   <build_export_depend>geometry_msgs</build_export_depend>
-  <build_export_depend>OpenCV</build_export_depend>
->>>>>>> 30531393cab546a6c417a767c67c5ba65382bd42
 
   <exec_depend>roscpp</exec_depend>
   <exec_depend>cv_bridge</exec_depend>
   <exec_depend>image_transport</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
-<<<<<<< HEAD
   <exec_depend>OpenCV</exec_depend>
   <exec_depend>std_msgs</exec_depend>
-=======
   <exec_depend>geometry_msgs</exec_depend>
-  <exec_depend>OpenCV</exec_depend>
->>>>>>> 30531393cab546a6c417a767c67c5ba65382bd42
 
 
   <!-- The export tag contains other, unspecified, tags -->
