@@ -34,5 +34,5 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
 )
 
-add_executable(drive_node src/drive_node.cpp)
-target_link_libraries(drive_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+add_executable(line_drive_node src/line_drive_node.cpp)
+target_link_libraries(line_drive_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})

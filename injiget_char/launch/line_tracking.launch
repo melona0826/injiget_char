@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="line_detect" name= "detect_node" type="detect_node" respawn="false" output="screen"/>
+  <node pkg="line_detect" name= "finish_line_detect_node" type="finish_line_detect_node" respawn="false" output="screen"/>
+  <node pkg="auto_drive" name= "line_drive_node" type="line_drive_node" respawn="false" output="screen"/>
+</launch>

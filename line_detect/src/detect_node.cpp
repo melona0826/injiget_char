@@ -5,35 +5,39 @@
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/Image.h>
 #include <geometry_msgs/Pose2D.h>
+#include <std_msgs/String.h>
 #include <vector>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 using namespace cv;
+using namespace std::chrono_literals;
 
 int frame_wid = 640;
 int frame_hei = 300;
 
-int roi_x = 100;
+int roi_x = 10;
 int roi_y = 200;
 
-int roi_width = frame_wid - roi_x;
+int roi_width = frame_wid - roi_x*2;
 int roi_height = frame_hei - roi_y;
 
 int black_hue_low = 0;
 int black_hue_high = 180;
-int black_sat_low = 25 * (int)(255 / 100);
-int black_sat_high = 35 * (int)(255 / 100);
-int black_val_low = 20 * (int)(255 / 100);
-int black_val_high = 35 * (int)(255 / 100);
+int black_sat_low = (int)(20 * 255 / 100);
+int black_sat_high = (int)(50 * 255 / 100);
+int black_val_low = (int)(10 * 255 / 100);
+int black_val_high = (int)(35 * 255 / 100);
 
-
+void callTerminate(const std_msgs::String& msg)
+{
+  if(msg.data == "Terminate")
+    ros::shutdown();
+}
 
 int main(int argc, char** argv)
 {
-
-  Mat ref = imread("refer1.png", IMREAD_GRAYSCALE);
-  if(ref.empty())
-    ROS_ERROR("SIBAL");
   // Node Name : line_detect
   ros::init(argc, argv, "line_detect");
 
@@ -47,7 +51,11 @@ int main(int argc, char** argv)
     msg.theta = m (Radian degree of line)
   */
   geometry_msgs::Pose2D fitLine_msg;
-  ros::Publisher pub_fitLine = nh.advertise<geometry_msgs::Pose2D>("/line_detect/line_pos", 1000);
+  ros::Publisher pub_fitLine = nh.advertise<geometry_msgs::Pose2D>("/line_detect/line_pos", 1);
+
+  ros::Subscriber terminate_sub = nh.subscribe("/line_moving/terminate", 1, callTerminate);
+
+
 
   // Set Publishers & Sublscribers
   image_transport::ImageTransport it(nh);
@@ -77,7 +85,7 @@ int main(int argc, char** argv)
 
     // PreProcessing
     flip(frame, frame, -1);
-    frame = (frame * 0.5);
+    frame = (frame * 0.7);
 
     Mat grayImg, blurImg, edgeImg, copyImg;
 
@@ -157,7 +165,7 @@ int main(int argc, char** argv)
     }
 
 
-    //ROS_INFO("cols : %d , rows : %d" , frame.cols, frame.rows);
+    //ROS_INFO("X : %d , Y : %d" , fitLine_msg.x, fitLine_msg.y);
     sensor_msgs::ImagePtr pub_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
     sensor_msgs::ImagePtr pub_msg2 = cv_bridge::CvImage(std_msgs::Header(), "bgr8", copyImg).toImageMsg();
     pub.publish(pub_msg);

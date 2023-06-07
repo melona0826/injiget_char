@@ -5,26 +5,37 @@
 #include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/Image.h>
 #include <geometry_msgs/Pose2D.h>
+#include <std_msgs/String.h>
 #include <vector>
+#include <chrono>
+#include <thread>
 
 using namespace std;
 using namespace cv;
+using namespace std::chrono_literals;
 
 int frame_wid = 640;
-int frame_hei = 480;
+int frame_hei = 300;
 
-int roi_x = 0;
-int roi_y = 0;
+int roi_x = 50;
+int roi_y = 100;
 
-int roi_width = frame_wid - roi_x;
+int roi_width = frame_wid - roi_x*2;
 int roi_height = frame_hei - roi_y;
 
-int black_hue_low = 0;
-int black_hue_high = 255;
-int black_sat_low = 12 * (int)(255 / 100);
-int black_sat_high = 50 * (int)(255 / 100);
-int black_val_low = 0 * (int)(255 / 100);
-int black_val_high = 70 * (int)(255 / 100);
+int black_hue_low = (int)(180 / 2);
+int black_hue_high = (int)(230 / 2);
+int black_sat_low = 55 * (int)(255 / 100);
+int black_sat_high = 100 * (int)(255 / 100);
+int black_val_low = 55 * (int)(255 / 100);
+int black_val_high = 100 * (int)(255 / 100);
+
+void callTerminate(const std_msgs::String& msg)
+{
+  if(msg.data == "Terminate")
+    ros::shutdown();
+}
+
 
 int main(int argc, char** argv)
 {
@@ -41,12 +52,15 @@ int main(int argc, char** argv)
     msg.theta = m (Radian degree of line)
   */
   geometry_msgs::Pose2D fitLine_msg;
-  ros::Publisher pub_fitLine = nh.advertise<geometry_msgs::Pose2D>("/line_detect/line_pos", 1000);
+  ros::Publisher pub_fitLine = nh.advertise<geometry_msgs::Pose2D>("/finish_line_detect/line_pos", 1);
+
+  ros::Subscriber terminate_sub = nh.subscribe("/line_moving/terminate", 1, callTerminate);
+
 
   // Set Publishers & Sublscribers
   image_transport::ImageTransport it(nh);
-  image_transport::Publisher pub = it.advertise("/line_detect/detect_img", 1);
-  image_transport::Publisher pub2 = it.advertise("/line_detect/line_img", 1);
+  image_transport::Publisher pub = it.advertise("/finish_line_detect/detect_img", 1);
+  image_transport::Publisher pub2 = it.advertise("/finish_line_detect/line_img", 1);
   image_transport::Subscriber sub = it.subscribe("/usb_cam/image_raw", 1,
   [&](const sensor_msgs::ImageConstPtr& msg){
     cv_bridge::CvImageConstPtr cv_ptr;
@@ -68,7 +82,11 @@ int main(int argc, char** argv)
     Mat img_hsv, line_mask, img_line, img_edge;
     Mat test;
     Mat frame = cv_ptr->image;
+
+    // PreProcessing
     flip(frame, frame, -1);
+    frame = (frame * 0.7);
+
     Mat grayImg, blurImg, edgeImg, copyImg;
 
     Point pt1, pt2;
@@ -90,8 +108,8 @@ int main(int argc, char** argv)
     img_line.copyTo(copyImg);
 
     // Canny Edge Detection
-    cvtColor(img_line, img_line, COLOR_BGR2GRAY);
-    Canny(img_line, img_edge, 100, 170);
+    cvtColor(img_line, grayImg, COLOR_BGR2GRAY);
+    Canny(grayImg, img_edge, 100, 170);
 
     // Line Dtection
     HoughLinesP(img_edge, lines, 1, CV_PI / 180 , 6 , 15, 12);
@@ -108,7 +126,7 @@ int main(int argc, char** argv)
       //cout << slope << endl;
 
       cv::line(frame, Point(pt1.x, pt1.y) , Point(pt2.x , pt2.y) , Scalar(0,255,0) , 2 , 8);
-      if(abs(slope) >= slope_treshold)
+      if(abs(slope) < slope_treshold)
       {
         selected_lines.push_back(line);
         pts.push_back(pt1);
@@ -146,10 +164,8 @@ int main(int argc, char** argv)
       line(frame, Point(I[0], I[1]), Point(I[2], I[3]) , Scalar(255,0,0) , 2 , 8);
     }
 
-
-    //ROS_INFO("cols : %d , rows : %d" , frame.cols, frame.rows);
     sensor_msgs::ImagePtr pub_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", frame).toImageMsg();
-    sensor_msgs::ImagePtr pub_msg2 = cv_bridge::CvImage(std_msgs::Header(), "mono8", img_edge).toImageMsg();
+    sensor_msgs::ImagePtr pub_msg2 = cv_bridge::CvImage(std_msgs::Header(), "bgr8", copyImg).toImageMsg();
     pub.publish(pub_msg);
     pub2.publish(pub_msg2);
     pub_fitLine.publish(fitLine_msg);

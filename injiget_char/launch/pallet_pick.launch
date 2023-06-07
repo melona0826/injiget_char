@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="pallet_det" name= "pallet_det_node" type="pallet_det_node" respawn="false" output="screen"/>
+  <node pkg="pick_move" name= "pallet_drive_node" type="pallet_drive_node" respawn="false" output="screen"/>
+</launch>

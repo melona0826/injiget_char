@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(line_detect)
+project(pallet_det)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -34,8 +34,5 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
 )
 
-add_executable(detect_node src/detect_node.cpp)
-target_link_libraries(detect_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
-
-add_executable(finish_line_detect_node src/finish_line_detect_node.cpp)
-target_link_libraries(finish_line_detect_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+add_executable(pallet_det_node src/pallet_det_node.cpp)
+target_link_libraries(pallet_det_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})

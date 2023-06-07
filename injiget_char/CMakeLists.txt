@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(line_detect)
+project(injiget_char)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -12,14 +12,13 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   image_transport
-  std_msgs
 )
 
 find_package(OpenCV REQUIRED)
 
 catkin_package(
   LIBRARIES opencv
-  CATKIN_DEPENDS cv_bridge image_transport roscpp sensor_msgs std_msgs
+  CATKIN_DEPENDS cv_bridge image_transport roscpp sensor_msgs
 )
 
 ###########
@@ -34,8 +33,5 @@ include_directories(
   ${OpenCV_INCLUDE_DIRS}
 )
 
-add_executable(detect_node src/detect_node.cpp)
-target_link_libraries(detect_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
-
-add_executable(finish_line_detect_node src/finish_line_detect_node.cpp)
-target_link_libraries(finish_line_detect_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
+add_executable(start_node src/start_node.cpp)
+target_link_libraries(start_node ${catkin_LIBRARIES} ${OpenCV_LIBRARIES})
