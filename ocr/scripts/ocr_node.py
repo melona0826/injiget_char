@@ -34,10 +34,15 @@ class ocrNode :
 
     rospy.Subscriber('/usb_cam/image_raw', Image, self.callback)
     rospy.Subscriber('/ocr/toggle', String, self.toggleCallback)
-    rospy.Subscriber('/object/name', String, self.objectCallback)
+    # rospy.Subscriber('/object/name', String, self.objectCallback)
+    rospy.Subscriber('/classification_node/obj_name', String, self.nameCallback)
 
-  def objectCallback(self, msg) :
-    self.obj_name = msg.data
+  def nameCallback(self, msg):
+    if msg.data != None :
+      self.obj_name = msg.data
+
+  # def objectCallback(self, msg) :
+  #   self.obj_name = msg.data
 
   def toggleCallback(self, msg) :
     self.ocr_toggle = 1
@@ -174,15 +179,17 @@ class ocrNode :
 
         ans, pos = self.trocr(frame, ["welchs", "cantata", "oronamin", "tejava", "demisoda"], 4, detail=True)
 
-        idx = ans.index(self.obj_name)
-        self.pos_msg.x = pos[idx][0]
-        self.pos_msg.y = pos[idx][1]
-        self.pub_pos.publish(self.pos_msg)
-        self.pub_tog.publish("Place")
-        rospy.loginfo("[OCR] x : " + str(self.pos_msg.x))
-        rospy.loginfo("[OCR] y : " + str(self.pos_msg.y))
-        time.sleep(1)
-        #rospy.signal_shutdown("Success OCR")
+        if self.obj_name in ans :
+          idx = ans.index(self.obj_name)
+          self.pos_msg.x = pos[idx][0]
+          self.pos_msg.y = pos[idx][1]
+          self.pub_pos.publish(self.pos_msg)
+          self.pub_tog.publish("Place")
+          rospy.loginfo("[OCR] x : " + str(self.pos_msg.x))
+          rospy.loginfo("[OCR] y : " + str(self.pos_msg.y))
+          time.sleep(1)
+          rospy.signal_shutdown("Success OCR")
+
 
       except Exception as e :
         rospy.logerr(e)

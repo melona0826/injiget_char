@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="classification" name= "classification_node" type="classification_node.py" respawn="false" output="screen"/>
+</launch>

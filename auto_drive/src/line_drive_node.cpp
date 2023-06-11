@@ -100,13 +100,13 @@ class SubAndPub
 
         if(msg.x > center + tor)
         {
-          cmd_vel.angular.z = -0.15;
+          cmd_vel.angular.z = -0.18;
           ROS_INFO(" RIGHT ! ");
         }
 
         else if(msg.x < center - tor)
         {
-          cmd_vel.angular.z = 0.15;
+          cmd_vel.angular.z = 0.18;
           ROS_INFO(" LEFT ! ");
         }
 
@@ -115,7 +115,7 @@ class SubAndPub
           cmd_vel.angular.z = 0.0;
         }
 
-        cmd_vel.linear.x = 0.1;
+        cmd_vel.linear.x = 0.15;
         cmd_vel.linear.y= 0.0;
         pub_.publish(cmd_vel);
       }

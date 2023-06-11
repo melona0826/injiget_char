@@ -1,3 +1,6 @@
 <launch>
-  <node pkg="injiget_char" name= "start_node" type="start_node" respawn="false" output="screen"/>
+  <include file="$(find injiget_char)/launch/classification.launch"/>
+  <include file="$(find injiget_char)/launch/pallet_pick.launch"/>
+  <include file="$(find injiget_char)/launch/line_tracking.launch"/>
+  <include file="$(find injiget_char)/launch/ocr.launch"/>
 </launch>
