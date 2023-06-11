@@ -19,9 +19,9 @@ class SubAndPub
   public:
     SubAndPub()
     {
-      pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel" ,100 , true);
-      pub_tilt_ = nh_.advertise<std_msgs::String>("/tilt/mode", 100, true);
-      pub_fork_ = nh_.advertise<std_msgs::String>("/fork/mode", 100, true);
+      pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel" ,1 , true);
+      pub_tilt_ = nh_.advertise<std_msgs::String>("/tilt/mode", 1, true);
+      pub_fork_ = nh_.advertise<std_msgs::String>("/fork/mode", 1, true);
       pub_terminate_ = nh_.advertise<std_msgs::String>("/pallet_pick/terminate", 1, true);
       pub_drive_toggle_ = nh_.advertise<std_msgs::String>("/drive_start/toggle", 1, true);
       sub_start_ = nh_.subscribe("/pallet_det/toggle", 1,  &SubAndPub::toggleCallback, this);
@@ -132,10 +132,10 @@ class SubAndPub
     std_msgs::String drive_toggle_msg;
     geometry_msgs::Twist cmd_vel;
     int start_toggle = 0;
-    float turn_f_speed = 0.1;
-    float turn_speed = 0.07;
+    float turn_f_speed = 0.0;
+    float turn_speed = 0.05;
     int center = 320;
-    int tor = 7;
+    int tor = 15;
     int toggle = 0;
     int tilt_down_toggle = 0;
 };

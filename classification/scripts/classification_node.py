@@ -48,8 +48,8 @@ class ClassficationNode() :
         self.pub_pick_start.publish("Start")
         self.pub.publish(self.obj_name)
         self.pub_box_img.publish(self.bridge.cv2_to_imgmsg(self.box_img, "bgr8"))
-        time.sleep(1)
-        rospy.signal_shutdown("Success Classification")
+        # time.sleep(1)
+        # rospy.signal_shutdown("Success Classification")
 
 
 

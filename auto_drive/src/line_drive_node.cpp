@@ -18,11 +18,11 @@ class SubAndPub
   public:
     SubAndPub()
     {
-      pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel" ,100 , true);
-      pub_tilt_ = nh_.advertise<std_msgs::String>("/tilt/mode", 100, true);
-      pub_terminate_ = nh_.advertise<std_msgs::String>("/line_moving/terminate", 100, true);
-      pub_ocr_start_ = nh_.advertise<std_msgs::String>("/ocr/toggle" , 100, true);
-      pub_obj_ = nh_.advertise<std_msgs::String>("/object/name" , 100 , true);
+      pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel" ,1 , true);
+      pub_tilt_ = nh_.advertise<std_msgs::String>("/tilt/mode", 1, true);
+      pub_terminate_ = nh_.advertise<std_msgs::String>("/line_moving/terminate", 1, true);
+      pub_ocr_start_ = nh_.advertise<std_msgs::String>("/ocr/toggle" , 1, true);
+      pub_obj_ = nh_.advertise<std_msgs::String>("/object/name" , 1 , true);
       sub_start_ = nh_.subscribe("/drive_start/toggle", 1, &SubAndPub::toggleCallback, this);
       sub_ = nh_.subscribe("/line_detect/line_pos", 1,  &SubAndPub::callback, this);
       sub_obj_name = nh_.subscribe("/object/name", 1, &SubAndPub::objCallBack, this);
@@ -52,22 +52,24 @@ class SubAndPub
           cmd_vel.angular.z = 0.0;
           pub_.publish(cmd_vel);
         }
-        else if(finish_toggle && msg.x < finish_center - finishi_tor)
+        else if(finish_toggle && msg.theta < finish_center - finishi_tor)
         {
           finish_toggle = 1;
           cmd_vel.linear.x = 0.0;
           cmd_vel.linear.y= 0.0;
           cmd_vel.angular.z = 0.02;
           pub_.publish(cmd_vel);
+          ROS_INFO("LEFT !");
         }
 
-        else if(finish_toggle && msg.x > finish_center + finishi_tor)
+        else if(finish_toggle && msg.theta > finish_center + finishi_tor)
         {
           finish_toggle = 1;
           cmd_vel.linear.x = 0.0;
           cmd_vel.linear.y= 0.0;
           cmd_vel.angular.z = -0.02;
           pub_.publish(cmd_vel);
+          ROS_INFO("RIGHT !");
         }
 
         else if(finish_toggle)
@@ -86,7 +88,7 @@ class SubAndPub
           ros::shutdown();
         }
 
-        ROS_INFO("[FINISH LINE] X : %f  |  Y : %f" , msg.x, msg.y);
+        ROS_INFO("[FINISH LINE] m : %f" , msg.theta);
       }
     }
 
@@ -141,8 +143,8 @@ class SubAndPub
     int start_toggle = 0;
     int finish_toggle = 0;
     int center = 320;
-    int finish_center = 180;
-    int finishi_tor = 35;
+    int finish_center = 0.0;
+    int finishi_tor = 0.3;
     int tor = 60;
 };
 

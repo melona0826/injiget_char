@@ -36,8 +36,8 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "pallet_det");
   ros::NodeHandle nh;
 
-  ros::Publisher pub_tilt = nh.advertise<std_msgs::String>("/tilt/mode", 100, true);
-  ros::Publisher pub_fork = nh.advertise<std_msgs::String>("/fork/mode", 100, true);
+  ros::Publisher pub_tilt = nh.advertise<std_msgs::String>("/tilt/mode", 1, true);
+  ros::Publisher pub_fork = nh.advertise<std_msgs::String>("/fork/mode", 1, true);
   std_msgs::String tilt_mode;
   std_msgs::String fork_mode;
   tilt_mode.data = "front";
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
   ros::Subscriber terminate_sub = nh.subscribe("/pallet_pick/terminate", 1, callTerminate);
 
   geometry_msgs::Pose2D fitLine_msg;
-  ros::Publisher pub_fitLine = nh.advertise<geometry_msgs::Pose2D>("/pallet_det/pallet_pos",1000);
+  ros::Publisher pub_fitLine = nh.advertise<geometry_msgs::Pose2D>("/pallet_det/pallet_pos",1);
 
   h_min = (int)(h_min/2);
   h_max = (int)(h_max/2);
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
     vector<Point> pts;
     Vec4d fit_line;
     Point pt1, pt2;
-    double slope_treshold = (90 - 45) * CV_PI / 180.0;
+    double slope_treshold = (90 - 70) * CV_PI / 180.0;
 
     frame.copyTo(img_recog);
 
@@ -140,6 +140,7 @@ int main(int argc, char** argv)
 
       // cout << "x : " << b.x << endl;;
       // cout << "y : " << b.y << endl;;
+      // cout << "m : " << m * CV_PI / 180 << endl;
       terminate_count = 0;
     }
 

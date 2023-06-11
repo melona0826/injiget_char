@@ -34,15 +34,15 @@ class ocrNode :
 
     rospy.Subscriber('/usb_cam/image_raw', Image, self.callback)
     rospy.Subscriber('/ocr/toggle', String, self.toggleCallback)
-    # rospy.Subscriber('/object/name', String, self.objectCallback)
+    rospy.Subscriber('/object/name', String, self.objectCallback)
     rospy.Subscriber('/classification_node/obj_name', String, self.nameCallback)
 
   def nameCallback(self, msg):
     if msg.data != None :
       self.obj_name = msg.data
 
-  # def objectCallback(self, msg) :
-  #   self.obj_name = msg.data
+  def objectCallback(self, msg) :
+    self.obj_name = msg.data
 
   def toggleCallback(self, msg) :
     self.ocr_toggle = 1
