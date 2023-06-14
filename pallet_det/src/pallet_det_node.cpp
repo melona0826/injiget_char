@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 
     Mat frame = cv_ptr->image;
     flip(frame, frame, -1);
-    frame = frame * 0.6;
+    frame = frame * 0.8;
 
     Mat img_hsv, img_pallet, img_edge, img_recog;
     Mat pallet_mask;

@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 
       // PreProcessing
       flip(frame, frame, -1);
-      frame = (frame * 0.7);
+      frame = (frame * 0.8);
 
       Mat grayImg, blurImg, edgeImg, copyImg;
 

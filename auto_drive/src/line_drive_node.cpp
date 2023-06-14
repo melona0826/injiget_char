@@ -22,10 +22,10 @@ class SubAndPub
       pub_tilt_ = nh_.advertise<std_msgs::String>("/tilt/mode", 1, true);
       pub_terminate_ = nh_.advertise<std_msgs::String>("/line_moving/terminate", 1, true);
       pub_ocr_start_ = nh_.advertise<std_msgs::String>("/ocr/toggle" , 1, true);
-      pub_obj_ = nh_.advertise<std_msgs::String>("/object/name" , 1 , true);
+      // pub_obj_ = nh_.advertise<std_msgs::String>("/object/name" , 1 , true);
       sub_start_ = nh_.subscribe("/drive_start/toggle", 1, &SubAndPub::toggleCallback, this);
       sub_ = nh_.subscribe("/line_detect/line_pos", 1,  &SubAndPub::callback, this);
-      sub_obj_name = nh_.subscribe("/object/name", 1, &SubAndPub::objCallBack, this);
+      // sub_obj_name = nh_.subscribe("/object/name", 1, &SubAndPub::objCallBack, this);
       sub_finish_ = nh_.subscribe("/finish_line_detect/line_pos" , 1, &SubAndPub::finsihCallback, this);
     }
 
@@ -35,10 +35,10 @@ class SubAndPub
         start_toggle = 1;
     }
 
-    void objCallBack(const std_msgs::String& msg)
-    {
-      obj_name_msg.data = msg.data;
-    }
+    // void objCallBack(const std_msgs::String& msg)
+    // {
+    //   obj_name_msg.data = msg.data;
+    // }
 
     void finsihCallback(const geometry_msgs::Pose2D& msg)
     {
@@ -83,7 +83,7 @@ class SubAndPub
           std::this_thread::sleep_for(2s);
 
           ocr_toggle_msg.data = "Start";
-          pub_obj_.publish(obj_name_msg);
+          // pub_obj_.publish(obj_name_msg);
           pub_ocr_start_.publish(ocr_toggle_msg);
 
           ros::shutdown();
@@ -132,7 +132,7 @@ class SubAndPub
     ros::Publisher pub_tilt_;
     ros::Publisher pub_terminate_;
     ros::Publisher pub_ocr_start_;
-    ros::Publisher pub_obj_;
+    // ros::Publisher pub_obj_;
     ros::Subscriber sub_start_;
     ros::Subscriber sub_;
     ros::Subscriber sub_finish_;

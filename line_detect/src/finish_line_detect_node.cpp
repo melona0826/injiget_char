@@ -15,7 +15,7 @@ using namespace cv;
 using namespace std::chrono_literals;
 
 int frame_wid = 640;
-int frame_hei = 300;
+int frame_hei = 400;
 
 int roi_x = 50;
 int roi_y = 100;
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
 
       // PreProcessing
       flip(frame, frame, -1);
-      frame = (frame * 0.7);
+      frame = (frame * 0.8);
 
       Mat grayImg, blurImg, edgeImg, copyImg;
 

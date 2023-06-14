@@ -32,23 +32,30 @@ class ocrNode :
     self.pos_msg.x = 0
     self.pos_msg.y = 0
     self.det_success = 0
+    self.reset_toggle = 0
 
     rospy.Subscriber('/usb_cam/image_raw', Image, self.callback)
     rospy.Subscriber('/ocr/toggle', String, self.toggleCallback)
-    rospy.Subscriber('/object/name', String, self.objectCallback)
+    # rospy.Subscriber('/object/name', String, self.objectCallback)
     rospy.Subscriber('/classification_node/obj_name', String, self.nameCallback)
     rospy.Subscriber('/ocr/reset', String, self.resetCallback)
+    rospy.Subscriber('ocr/terminate', String, self.terminateCallback)
+
+  def terminateCallback(self, msg) :
+    if msg.data == "Terminate" :
+      rospy.signal_shutdown("Success !")
 
   def resetCallback(self, msg) :
     if msg.data == "Reset" :
       self.det_success = 0
+      self.reset_toggle = 1
 
   def nameCallback(self, msg):
     if msg.data != None :
       self.obj_name = msg.data
 
-  def objectCallback(self, msg) :
-    self.obj_name = msg.data
+  # def objectCallback(self, msg) :
+  #   self.obj_name = msg.data
 
   def toggleCallback(self, msg) :
     self.ocr_toggle = 1
@@ -194,7 +201,8 @@ class ocrNode :
             self.pub_tog.publish("Start")
             rospy.loginfo("[OCR] x : " + str(self.pos_msg.x))
             rospy.loginfo("[OCR] y : " + str(self.pos_msg.y))
-            self.det_success = 1
+            if self.reset_toggle == 0:
+              self.det_success = 1
             # time.sleep(1)
             # rospy.signal_shutdown("Success OCR")
 

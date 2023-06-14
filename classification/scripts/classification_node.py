@@ -21,13 +21,13 @@ class ClassficationNode() :
     self.toggle = 1
     self.obj_name = None
     self.box_img = None
-    pub_tilt = rospy.Publisher('/tilt/mode', String, queue_size=1)
-    pub_fork = rospy.Publisher('/fork/mode', String, queue_size=1)
+    # pub_tilt = rospy.Publisher('/tilt/mode', String, queue_size=1)
+    # pub_fork = rospy.Publisher('/fork/mode', String, queue_size=1)
 
-    pub_fork.publish("down")
-    pub_tilt.publish("front")
+    # pub_fork.publish("down")
+    # pub_tilt.publish("front")
 
-    time.sleep(1)
+    # time.sleep(1)
     rospy.Subscriber('/usb_cam/image_raw', Image, self.callback)
 
   def callback(self, msg) :

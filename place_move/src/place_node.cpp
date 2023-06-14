@@ -24,6 +24,10 @@ class SubAndPub
     {
       pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel" ,1 , true);
       pub_reset_ = nh_.advertise<std_msgs::String>("ocr/reset", 1, true);
+      pub_tilt_ = nh_.advertise<std_msgs::String>("/tilt/mode", 1, true);
+      pub_fork_ = nh_.advertise<std_msgs::String>("/fork/mode", 1, true);
+      pub_term_ = nh_.advertise<std_msgs::String>("/ocr/terminate", 1, true);
+
       sub_start_ = nh_.subscribe("/place/toggle", 1,  &SubAndPub::toggleCallback, this);
       sub_imu_ = nh_.subscribe("/imu", 1, &SubAndPub::imuCallback, this);
       sub_odom_ = nh_.subscribe("/odom", 1, &SubAndPub::odomCallback, this);
@@ -93,7 +97,7 @@ class SubAndPub
       {
         angle = quart2euler(msg.orientation.x, msg.orientation.y, msg.orientation.z , msg.orientation.w);
 
-        if(abs(angle - start_ang) < 89.8)
+        if(abs(angle - start_ang) < 89.7)
         {
           ROS_INFO("Ang : %f", angle);
           cmd_vel.angular.z = turn_spd;
@@ -112,9 +116,9 @@ class SubAndPub
       {
         angle = quart2euler(msg.orientation.x, msg.orientation.y, msg.orientation.z , msg.orientation.w);
 
-        if(abs(angle - start_ang) > 0.1)
+        if(abs(angle - start_ang) > 0.15)
         {
-          ROS_INFO("Ang : %f", angle);
+          ROS_INFO("recov Ang : %f", angle);
           cmd_vel.angular.z = -1 * turn_spd;
           ROS_INFO("Move !");
         }
@@ -145,7 +149,7 @@ class SubAndPub
           ROS_INFO("X : %f" , msg.x);
           ROS_INFO("Y : %f" , msg.y);
           turn_toggle = 1;
-          ref_dist = (abs(center - msg.x)) * (height / (msg.y * 1000));
+          ref_dist = (abs(center - msg.x) ) * ( height / ( msg.y * 1000));
           first_toggle = 0;
 
           if(msg.x > center + tor)
@@ -156,25 +160,113 @@ class SubAndPub
         {
           reset_msg.data = "Reset";
           pub_reset_.publish(reset_msg);
+
+          if(!reset_toggle)
+          {
+            reset_toggle = 1;
+          }
+
+          else
+          {
+            ROS_INFO("X : %f, Y : %f", msg.x, msg.y);
+
+            if(msg.y >= 200)
+            {
+              cmd_vel.linear.x = 0.0;
+              cmd_vel.linear.y= 0.0;
+              cmd_vel.angular.z = 0.0;
+              pub_.publish(cmd_vel);
+              std::this_thread::sleep_for(2s);
+
+
+              for(int i = 0; i < 30; i++)
+              {
+                cmd_vel.linear.x = 0.3;
+                cmd_vel.linear.y= 0.0;
+                cmd_vel.angular.z = 0.0;
+                pub_.publish(cmd_vel);
+              }
+              std::this_thread::sleep_for(2s);
+
+              tilt_mode.data = "line";
+              fork_mode.data = "down";
+              pub_tilt_.publish(tilt_mode);
+              pub_fork_.publish(fork_mode);
+              std::this_thread::sleep_for(1s);
+
+
+              for(int i = 0; i < 20; i++)
+              {
+                cmd_vel.linear.x = -0.3;
+                cmd_vel.linear.y= 0.0;
+                cmd_vel.angular.z = 0.0;
+                pub_.publish(cmd_vel);
+              }
+              std::this_thread::sleep_for(2s);
+
+              cmd_vel.linear.x = -0.0;
+              cmd_vel.linear.y= 0.0;
+              cmd_vel.angular.z = 0.0;
+              pub_.publish(cmd_vel);
+              std::this_thread::sleep_for(1s);
+
+              term_msg.data = "Terminate";
+              pub_term_.publish(term_msg);
+              std::this_thread::sleep_for(2s);
+
+              ros::shutdown();
+
+            }
+
+            if(msg.x < center-tor)
+            {
+              cmd_vel.linear.x = 0.0;
+              cmd_vel.angular.z = 0.08;
+              ROS_INFO("LEFT !");
+            }
+
+            else if(msg.x > center+tor)
+            {
+              cmd_vel.linear.x = 0.0;
+              cmd_vel.angular.z = -0.08;
+              ROS_INFO("RIGHT !");
+            }
+
+            else
+            {
+              cmd_vel.angular.z = 0.0;
+              cmd_vel.linear.x = 0.13;
+              ROS_INFO("GOGOYA !");
+            }
+
+          }
+
+
         }
-
-
 
         pub_.publish(cmd_vel);
       }
+
+
     }
 
   private:
     ros::NodeHandle nh_;
     ros::Publisher pub_;
     ros::Publisher pub_reset_;
+    ros::Publisher pub_tilt_;
+    ros::Publisher pub_fork_;
+    ros::Publisher pub_term_;
     ros::Subscriber sub_;
     ros::Subscriber sub_start_;
     ros::Subscriber sub_imu_;
     ros::Subscriber sub_odom_;
+    std_msgs::String tilt_mode;
+    std_msgs::String fork_mode;
     std_msgs::String terminate_msg;
     std_msgs::String drive_toggle_msg;
     std_msgs::String reset_msg;
+    std_msgs::String term_msg;
     geometry_msgs::Twist cmd_vel;
     int start_toggle = 0;
     int first_toggle = 1;
@@ -183,12 +275,13 @@ class SubAndPub
     int recover_toggle = 0;
     int final_place_toggle = 0;
     int center = 320;
-    int tor = 10;
+    int tor = 20;
     int toggle = 0;
+    int reset_toggle = 0;
     double ref_dist = 0;
     double start_pos;
     double start_ang;
-    double height = 115;
+    double height = 117;
     double angle = 0;
     double scale_factor = 0;
     double turn_spd = 0.2;
