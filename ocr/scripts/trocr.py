@@ -45,8 +45,8 @@ if __name__ == "__main__":
   device = "cuda:0" if torch.cuda.is_available() else "cpu"
   print(device)
 
-  # processor = TrOCRProcessor.from_pretrained("../models/trocr-base-handwritten")
-  # model = VisionEncoderDecoderModel.from_pretrained("../models/trocr-base-handwritten")
+  processor = TrOCRProcessor.from_pretrained("../models/trocr-base-handwritten")
+  model = VisionEncoderDecoderModel.from_pretrained("../models/trocr-base-handwritten")
 
   processor = TrOCRProcessor.from_pretrained("microsoft/trocr-base-handwritten")
   model = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-base-handwritten")

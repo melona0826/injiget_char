@@ -14,8 +14,8 @@
 using namespace std;
 using namespace cv;
 
-int h_min = 45;
-int h_max = 65;
+int h_min = 40;
+int h_max = 70;
 
 int s_min = 40;
 int s_max = 100;
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 
     Mat frame = cv_ptr->image;
     flip(frame, frame, -1);
-    frame = frame * 0.8;
+    frame = frame * 0.6;
 
     Mat img_hsv, img_pallet, img_edge, img_recog;
     Mat pallet_mask;
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
     vector<Point> pts;
     Vec4d fit_line;
     Point pt1, pt2;
-    double slope_treshold = (90 - 70) * CV_PI / 180.0;
+    double slope_treshold = (90 - 60) * CV_PI / 180.0;
 
     frame.copyTo(img_recog);
 

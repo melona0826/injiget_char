@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="place_move" name= "place_node" type="place_node" respawn="false" output="screen"/>
+</launch>

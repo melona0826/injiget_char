@@ -8,7 +8,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import time
 from ultralytics import YOLO
 
-objects = {0:"cantata" , 1:  "tajava", 2:  "oronamin", 3: "welchs", 4: "demisoda"}
+objects = {0:"cantata" , 1:  "tejava", 2:  "oronamin", 3: "welchs", 4: "demisoda"}
 
 class ClassficationNode() :
   def __init__(self) :
@@ -50,6 +50,8 @@ class ClassficationNode() :
         self.pub_box_img.publish(self.bridge.cv2_to_imgmsg(self.box_img, "bgr8"))
         # time.sleep(1)
         # rospy.signal_shutdown("Success Classification")
+
+    self.pub.publish(self.obj_name)
 
 
 

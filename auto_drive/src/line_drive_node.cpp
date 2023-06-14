@@ -44,6 +44,7 @@ class SubAndPub
     {
       if(start_toggle)
       {
+        ROS_INFO("[FINISH LINE] y : %f" , msg.y);
         if(!finish_toggle && msg.y > 30)
         {
           finish_toggle = 1;
@@ -79,7 +80,7 @@ class SubAndPub
           pub_tilt_.publish(tilt_mode);
           terminate_msg.data = "Terminate";
           pub_terminate_.publish(terminate_msg);
-          std::this_thread::sleep_for(1s);
+          std::this_thread::sleep_for(2s);
 
           ocr_toggle_msg.data = "Start";
           pub_obj_.publish(obj_name_msg);
@@ -89,6 +90,7 @@ class SubAndPub
         }
 
         ROS_INFO("[FINISH LINE] m : %f" , msg.theta);
+
       }
     }
 
@@ -117,7 +119,7 @@ class SubAndPub
           cmd_vel.angular.z = 0.0;
         }
 
-        cmd_vel.linear.x = 0.15;
+        cmd_vel.linear.x = 0.1;
         cmd_vel.linear.y= 0.0;
         pub_.publish(cmd_vel);
       }
@@ -143,8 +145,8 @@ class SubAndPub
     int start_toggle = 0;
     int finish_toggle = 0;
     int center = 320;
-    int finish_center = 0.0;
-    int finishi_tor = 0.3;
+    double finish_center = 0.0;
+    double finishi_tor = 0.8;
     int tor = 60;
 };
 

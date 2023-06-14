@@ -56,8 +56,8 @@ class SubAndPub
           tilt_down_toggle = 1;
           turn_f_speed = 0.0;
           turn_speed = 0.02;
-          center = 320;
-          tor = 7;
+          center = down_center;
+          tor = down_tor;
         }
 
         else if(tilt_down_toggle == 1 && (msg.y > 450 || msg.y == -333))
@@ -135,9 +135,12 @@ class SubAndPub
     float turn_f_speed = 0.0;
     float turn_speed = 0.05;
     int center = 320;
-    int tor = 15;
+    int tor = 10;
     int toggle = 0;
     int tilt_down_toggle = 0;
+
+    int down_center = 325;
+    int down_tor = 7;
 };
 
 int main(int argc, char** argv)

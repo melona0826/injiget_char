@@ -3,4 +3,5 @@
   <include file="$(find injiget_char)/launch/pallet_pick.launch"/>
   <include file="$(find injiget_char)/launch/line_tracking.launch"/>
   <include file="$(find injiget_char)/launch/ocr.launch"/>
+  <include file="$(find injiget_char)/launch/place.launch"/>
 </launch>

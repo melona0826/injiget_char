@@ -31,11 +31,17 @@ class ocrNode :
     self.pos_msg = Pose2D()
     self.pos_msg.x = 0
     self.pos_msg.y = 0
+    self.det_success = 0
 
     rospy.Subscriber('/usb_cam/image_raw', Image, self.callback)
     rospy.Subscriber('/ocr/toggle', String, self.toggleCallback)
     rospy.Subscriber('/object/name', String, self.objectCallback)
     rospy.Subscriber('/classification_node/obj_name', String, self.nameCallback)
+    rospy.Subscriber('/ocr/reset', String, self.resetCallback)
+
+  def resetCallback(self, msg) :
+    if msg.data == "Reset" :
+      self.det_success = 0
 
   def nameCallback(self, msg):
     if msg.data != None :
@@ -172,27 +178,32 @@ class ocrNode :
 
   def callback(self, msg) :
     if self.ocr_toggle == 1:
-      try :
-        rospy.loginfo("===OCR START===")
-        frame = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
-        frame = cv2.flip(frame, -1)
+      if self.det_success == 0 :
+        try :
+          rospy.loginfo("===OCR START===")
+          frame = self.bridge.imgmsg_to_cv2(msg, 'bgr8')
+          frame = cv2.flip(frame, -1)
 
-        ans, pos = self.trocr(frame, ["welchs", "cantata", "oronamin", "tejava", "demisoda"], 4, detail=True)
+          ans, pos = self.trocr(frame, ["welchs", "cantata", "oronamin", "tejava", "demisoda"], 4, detail=True)
 
-        if self.obj_name in ans :
-          idx = ans.index(self.obj_name)
-          self.pos_msg.x = pos[idx][0]
-          self.pos_msg.y = pos[idx][1]
-          self.pub_pos.publish(self.pos_msg)
-          self.pub_tog.publish("Place")
-          rospy.loginfo("[OCR] x : " + str(self.pos_msg.x))
-          rospy.loginfo("[OCR] y : " + str(self.pos_msg.y))
-          time.sleep(1)
-          rospy.signal_shutdown("Success OCR")
+          if self.obj_name in ans :
+            idx = ans.index(self.obj_name)
+            self.pos_msg.x = pos[idx][0]
+            self.pos_msg.y = pos[idx][1]
+            self.pub_pos.publish(self.pos_msg)
+            self.pub_tog.publish("Start")
+            rospy.loginfo("[OCR] x : " + str(self.pos_msg.x))
+            rospy.loginfo("[OCR] y : " + str(self.pos_msg.y))
+            self.det_success = 1
+            # time.sleep(1)
+            # rospy.signal_shutdown("Success OCR")
 
 
-      except Exception as e :
-        rospy.logerr(e)
+        except Exception as e :
+          rospy.logerr(e)
+
+      elif self.det_success == 1 :
+        self.pub_pos.publish(self.pos_msg)
 
 
 

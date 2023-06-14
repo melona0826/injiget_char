@@ -1,0 +1,4 @@
+<launch>
+  <include file="$(find injiget_char)/launch/ocr.launch"/>
+  <include file="$(find injiget_char)/launch/place.launch"/>
+</launch>
