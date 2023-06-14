@@ -10,7 +10,7 @@ SERVO_MAX_DUTY = 12
 tilt_pin = 32
 
 up = 95
-down = 40
+down = 45
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BOARD)
