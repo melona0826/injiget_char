@@ -1,3 +1,17 @@
+/***********************************************************************
+ * pallet_drive_node.cpp
+ *
+ * Author : Kwon Jin (School of Computer, KAIST)
+ * Date (Last Modify):2023.06.15
+ *
+ * Pallet pick Node
+ * Pick the pallet with detection nodes.
+ *
+ * Detection Node cpp File :
+ *   pallet_det/pallet_det_node.cpp
+ *
+ **********************************************************************/
+
 #include <ros/ros.h>
 #include <iostream>
 #include <geometry_msgs/Twist.h>
@@ -19,6 +33,43 @@ class SubAndPub
   public:
     SubAndPub()
     {
+      /*****************************************************************
+       * Notation)
+       *   Node Name = NN , Message Type = MT , Callback Function = CF
+       *
+       * (Publishers)
+       * pub_      :
+       *   turtlebot control topic publisher
+       *   (NN : "cmd_vel")
+       *
+       * pub_tilt_ :
+       *   tilt motor control topic publisher
+       *   (NN : "/tilt/mode")
+       *
+       * pub_fork_ :
+       *   fork control topic publisher
+       *   (NN : "/fork/mode")
+       *
+       * pub_terminate_ :
+       *   terminate toggle of line driving node &
+       *   line detection node topic publisher
+       *   (NN : "/drive_start/toggle")
+       *
+       * pub_drive_toggle_ :
+       *   start line dirving toggle publisher
+       *   (NN : "/drive_start/toggle")
+       *
+       *
+       * (Subscribers)
+       * sub_start_ :
+       *   pick start toggle topic subscriber
+       *   (NN : "/pallet_det/toggle" , CF : toggleCallback)
+       *
+       * sub_ :
+       *   detected pallet position subscriber
+       *   (NN : "/pallet_det/pallet_pos" , CF : callback)
+       *
+      */
       pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel" ,1 , true);
       pub_tilt_ = nh_.advertise<std_msgs::String>("/tilt/mode", 1, true);
       pub_fork_ = nh_.advertise<std_msgs::String>("/fork/mode", 1, true);
@@ -29,12 +80,27 @@ class SubAndPub
 
     }
 
+    /* toggleCallback Function
+    Params : (const std_msgs::String& msg)
+    Return : void
+
+    If msg.data is "Start", set the value of the start_toggle as 1 to
+    start.
+    */
     void toggleCallback(const std_msgs::String& msg)
     {
       if(msg.data == "Start")
         start_toggle = 1;
     }
 
+    /* callback Function
+    Params : (const geometry_msgs::Pose2D& msg)
+    Return : void
+
+    Get Pose2D message from the pallet detection node, and
+    determins the angular and linear speed of injiget_char by the Pose2D
+    information and pick pallet.
+    */
     void callback(const geometry_msgs::Pose2D& msg)
     {
       if(start_toggle)
@@ -43,6 +109,8 @@ class SubAndPub
         ROS_INFO("Y : %f" , msg.y);
         ROS_INFO("Theta : %f" , msg.theta);
 
+        // If pallet is close, down the tilt motor and change the center
+        // and torlance more thight.
         if(msg.y > 380 && toggle == 0 && tilt_down_toggle == 0)
         {
           tilt_mode.data = "object";
@@ -60,6 +128,8 @@ class SubAndPub
           tor = down_tor;
         }
 
+        // If pallet position is special message or pallet is close,
+        // pick the pallet
         else if(tilt_down_toggle == 1 && (msg.y > 450 || msg.y == -333))
         {
           cmd_vel.linear.x = 0.0;
@@ -88,6 +158,9 @@ class SubAndPub
           pub_drive_toggle_.publish(drive_toggle_msg);
           ros::shutdown();
         }
+
+        // If pallet position is tilted left or right,
+        // then turn the robot to pick pallet.
 
         else if(msg.x > center + tor)
         {
@@ -131,16 +204,19 @@ class SubAndPub
     std_msgs::String terminate_msg;
     std_msgs::String drive_toggle_msg;
     geometry_msgs::Twist cmd_vel;
+
+    // Toggles
     int start_toggle = 0;
+    int toggle = 0;
+    int tilt_down_toggle = 0;
+
+    // Tuining parameters
+    int down_center = 325;
+    int down_tor = 7;
     float turn_f_speed = 0.0;
     float turn_speed = 0.05;
     int center = 320;
     int tor = 10;
-    int toggle = 0;
-    int tilt_down_toggle = 0;
-
-    int down_center = 325;
-    int down_tor = 7;
 };
 
 int main(int argc, char** argv)

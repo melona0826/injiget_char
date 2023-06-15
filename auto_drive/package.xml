@@ -2,17 +2,13 @@
 <package format="2">
   <name>auto_drive</name>
   <version>0.1.0</version>
-  <description>The auto_drive package</description>
+  <description>
+  The auto_drive package. Implement line tracking
+  (i.e, follow the line) and when meet the finish line, stop and align robot.
+  </description>
 
-  <!-- One maintainer tag required, multiple allowed, one person per tag -->
-  <!-- Example:  -->
-  <!-- <maintainer email="jane.doe@example.com">Jane Doe</maintainer> -->
   <maintainer email="kwonjin@kaist.ac.kr">Kwon Jin</maintainer>
 
-
-  <!-- One license tag required, multiple allowed, one license per tag -->
-  <!-- Commonly used license strings: -->
-  <!--   BSD, MIT, Boost Software License, GPLv2, GPLv3, LGPLv2.1, LGPLv3 -->
   <license>BSD</license>
 
   <buildtool_depend>catkin</buildtool_depend>
@@ -37,9 +33,8 @@
   <exec_depend>OpenCV</exec_depend>
 
 
-  <!-- The export tag contains other, unspecified, tags -->
+
   <export>
-    <!-- Other tools can request additional information be placed here -->
 
   </export>
 </package>
