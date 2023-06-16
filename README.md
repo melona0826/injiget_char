@@ -1,5 +1,9 @@
 ### INjiget_char
 
+## Deomostration Video Link  
+https://www.youtube.com/watch?v=AUcnZOFWO9A  
+https://www.youtube.com/watch?v=OJm6Rzef218
+---
 
 Env
 ---
