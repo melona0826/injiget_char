@@ -1,4 +1,7 @@
-### INjiget_char
+### Injiget_char
+
+![Final Poster Template](https://github.com/melona0826/injiget_char/assets/61529916/d6fdac18-aab2-4170-9abe-759778d51bc5)
+
 
 ## Deomostration Video Link  
 https://www.youtube.com/watch?v=AUcnZOFWO9A  
