@@ -4,7 +4,7 @@
 
 ## 💁 Introduction  
 
-[![Video Label](http://img.youtube.com/vi/AUcnZOFWO9A/0.jpg)](https://youtu.be/AUcnZOFWO9A)   [![Video Label](http://img.youtube.com/vi/OJm6Rzef218/0.jpg)](https://youtu.be/OJm6Rzef218)  
+[![Video Label](http://img.youtube.com/vi/AUcnZOFWO9A/1.jpg)](https://youtu.be/AUcnZOFWO9A)   [![Video Label](http://img.youtube.com/vi/OJm6Rzef218/1.jpg)](https://youtu.be/OJm6Rzef218)  
 
 **(⬆️ You can see the demostration video by click above images ⬆️)**
 
