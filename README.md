@@ -1,28 +1,18 @@
 ### Injiget_char
 
-![Final Poster Template](https://github.com/melona0826/injiget_char/assets/61529916/d6fdac18-aab2-4170-9abe-759778d51bc5)
+<img src="https://github.com/melona0826/injiget_char/assets/61529916/7a597e1e-792c-439a-a03b-cddfef6bc43b" width="400" height="400"/>
 
+## 💁 Introduction  
 
-## Deomostration Video Link  
-https://www.youtube.com/watch?v=AUcnZOFWO9A  
-https://www.youtube.com/watch?v=OJm6Rzef218
----
+Injiget_char is OCR based Autonomous Forklift System Project.  
+This project for the 2023 Spring KAIST CS470 (Introduction to Artificial Intelligence) [Prof. Daehyng Park]
+Our base platform is TURTLEBOT3 and we modify the hardware.  
+|Hardware Modification|
+|-----------------------|
+|Built a Tilt system for camera|
+|Built a Jetson Nano|
+|Built a AP|
+|Built a forklift system|
 
-Env
----
-Ubuntu 20.04 (Host)
-Jetson Nano with Ubuntu 20.04 (Robot)
+We build a system
 
-- Before Run
-1. Install usb_cam package and start the launch of the usb_cam
-2. You need to built servo motor system with jetson nano GPIO
-3. You need make a hardware with fork and tilt system
-
-Install
----
-Branch host -> For host  
-Branch injiget_char -> For robot
-
-Launch
----
-rosluanch injigetchar start.launch
