@@ -3,8 +3,7 @@
 <img src="https://github.com/melona0826/injiget_char/assets/61529916/7a597e1e-792c-439a-a03b-cddfef6bc43b" width="400" height="400"/>
 
 ## 💁 Introduction  
-
-[![Video Label](http://img.youtube.com/vi/AUcnZOFWO9A/1.jpg)](https://youtu.be/AUcnZOFWO9A)   [![Video Label](http://img.youtube.com/vi/OJm6Rzef218/1.jpg)](https://youtu.be/OJm6Rzef218)  
+[![Video Label](http://img.youtube.com/vi/AUcnZOFWO9A/0.jpg)](https://youtu.be/AUcnZOFWO9A)   [![Video Label](http://img.youtube.com/vi/OJm6Rzef218/0.jpg)](https://youtu.be/OJm6Rzef218)  
 
 **(⬆️ You can see the demostration video by click above images ⬆️)**
 
