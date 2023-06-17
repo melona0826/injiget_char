@@ -117,7 +117,7 @@ Below is the table of the GPIO pin of Jetson Nano connected each servo motor.
 
 🤙 If you want to connect us, feel free to mail below mail address ❗
 
-  kwonjin@kaist.ac.kr
+    kwonjin@kaist.ac.kr
 
 
 
