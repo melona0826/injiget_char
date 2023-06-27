@@ -16,7 +16,7 @@ The Block diagram of Injiget_char system is below.
 
 ### Project Members
 
-* **Jin Kwon**
+* [**Jin Kwon**](https://github.com/melona0826)
   >(KAIST, School of Computing)  
   >kwonjin@kaist.ac.kr
 
