@@ -26,8 +26,9 @@ The Block diagram of Injiget_char system is below.
   >(KAIST, School of Computing)  
   >cookie000215@kaist.ac.kr 
 
-* **Youngwoo Jung**
+* [**Youngwoo Jung**](https://github.com/beautifulpie)
   >(KAIST, Department of Chemistry)
+  >jysys123@kaist.ac.kr
 * **Taewoong Yun**
   >(KAIST, Department of Aerospace Engineering)
 
